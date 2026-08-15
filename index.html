@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>タロットさんの心の鏡の部屋</title>
+    <!-- Chart.js ライブラリ -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #d1c4e9;      /* 宇宙に映えるやわらかなラベンダー */
+            --primary-light: #1a162b;      /* カード内や入力枠の深みのある濃紺 */
+            --accent-color: #9c27b0;       /* ミステリアスなパープル */
+            --highlight-color: #ffd700;    /* 星や月のように輝くゴールド */
+            --bg-color: #090a16;           /* 宇宙の深遠さを表現する黒に近い紺色 */
+            --card-bg: #121020;            /* コンテナ本体のダークナビィ */
+            --text-color: #e0e0e0;         /* 視認性の良い明るいテキスト */
+            --text-sub: #b0bec5;          /* 落ち着いたサブテキスト */
+            --border-color: #2a2440;       /* 境界線用のダークパープル */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 20%, #17153a 0%, #080711 80%);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 550px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 32px 28px;
+            border-radius: 20px;
+            border: 2px solid var(--highlight-color);
+            outline: 6px solid #2a1b4e;
+            outline-offset: 4px;
+            box-shadow: 
+                0 0 25px rgba(255, 215, 0, 0.25),
+                0 0 50px rgba(156, 39, 176, 0.3),
+                inset 0 0 20px rgba(255, 215, 0, 0.15);
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .container::before,
+        .container::after {
+            position: absolute;
+            font-size: 1.2rem;
+            color: var(--highlight-color);
+            pointer-events: none;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+        }
+
+        .container::before { content: "✦"; top: 8px; left: 12px; }
+        .container::after { content: "✦"; top: 8px; right: 12px; }
+
+        .corner-decor-bottom {
+            position: absolute;
+            bottom: 8px;
+            width: 100%;
+            left: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 12px;
+            box-sizing: border-box;
+            color: var(--highlight-color);
+            font-size: 1.2rem;
+            pointer-events: none;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+        }
+
+        .auth-screen { text-align: center; padding: 20px 0; }
+        .auth-screen h1 { color: var(--primary-color); font-size: 1.4rem; margin-bottom: 12px; letter-spacing: 1px; }
+        .auth-screen p { color: var(--text-sub); font-size: 0.9rem; margin-bottom: 24px; }
+        .auth-input {
+            width: 80%; padding: 12px; font-size: 1rem; border: 2px solid var(--border-color);
+            border-radius: 8px; text-align: center; outline: none; margin-bottom: 16px;
+            background-color: var(--primary-light); color: var(--text-color);
+        }
+        .auth-input:focus { border-color: var(--accent-color); }
+
+        .disclaimer-box {
+            background-color: var(--primary-light); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 14px 16px; margin-top: 24px; text-align: left;
+            font-size: 0.8rem; color: var(--text-sub); line-height: 1.5;
+        }
+        .disclaimer-title { font-weight: bold; color: var(--primary-color); margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+        .disclaimer-list { margin: 0; padding-left: 18px; }
+        .disclaimer-list li { margin-bottom: 4px; }
+
+        .intro-screen { display: none; }
+        .intro-screen h1 { color: var(--primary-color); font-size: 1.35rem; text-align: center; margin-top: 0; margin-bottom: 16px; letter-spacing: 1px; }
+        .intro-card { background-color: var(--primary-light); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+        .intro-step { display: flex; align-items: flex-start; margin-bottom: 16px; }
+        .intro-step:last-child { margin-bottom: 0; }
+        .step-badge {
+            background-color: var(--accent-color); color: white; font-weight: bold; font-size: 0.85rem;
+            width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; margin-right: 12px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+        .step-text { font-size: 0.95rem; color: var(--text-color); }
+        .step-text span { display: block; font-size: 0.85rem; color: var(--text-sub); margin-top: 2px; }
+
+        .main-screen { display: none; }
+        .step-indicator {
+            text-align: center; font-weight: bold; color: var(--highlight-color); font-size: 0.85rem;
+            letter-spacing: 1.5px; margin-bottom: 8px; background-color: var(--primary-light);
+            padding: 6px 16px; border-radius: 20px; display: inline-block; border: 1px solid var(--border-color);
+        }
+        .indicator-wrapper { text-align: center; margin-bottom: 16px; }
+
+        .card-box {
+            border: 1.5px solid var(--accent-color); border-radius: 12px; padding: 20px;
+            background-color: #171326; margin-bottom: 12px; text-align: center; box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        .card-title { font-weight: bold; font-size: 1.15rem; margin-bottom: 12px; color: var(--primary-color); letter-spacing: 0.5px; }
+        .card-image-wrapper { margin: 12px 0 16px 0; display: flex; justify-content: center; }
+        .card-image {
+            max-width: 160px; height: auto; border-radius: 8px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--border-color); transition: transform 0.3s ease;
+        }
+        .card-image.reversed { transform: rotate(180deg); }
+        .card-meaning {
+            font-size: 0.9rem; color: var(--text-color); text-align: left; background: var(--primary-light);
+            padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color); line-height: 1.6;
+        }
+
+        .redraw-btn {
+            background: none; border: 1px solid var(--accent-color); color: var(--primary-color);
+            padding: 6px 16px; font-size: 0.85rem; border-radius: 20px; cursor: pointer; margin-bottom: 20px;
+            display: inline-block; transition: all 0.2s;
+        }
+        .redraw-btn:hover { background-color: var(--primary-light); }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 0.95rem; color: var(--primary-color); }
+        .slider-container { margin-top: 8px; margin-bottom: 8px; }
+        input[type="range"] { width: 100%; accent-color: var(--highlight-color); cursor: pointer; }
+        .slider-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-sub); }
+
+        textarea {
+            width: 100%; height: 95px; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 10px;
+            box-sizing: border-box; font-size: 0.95rem; resize: vertical; background-color: var(--primary-light); color: var(--text-color);
+        }
+        textarea:focus { outline: none; border-color: var(--accent-color); background-color: #211c38; }
+
+        .btn {
+            width: 100%; background-color: #6a1b9a; color: white; border: none; padding: 14px; font-size: 1rem;
+            font-weight: bold; border-radius: 10px; cursor: pointer; transition: background-color 0.2s; letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(106, 27, 154, 0.4);
+        }
+        .btn:hover { background-color: #4a148c; }
+        .btn:disabled { background-color: #382d42; color: #756d7d; cursor: not-allowed; box-shadow: none; }
+
+        .btn-secondary {
+            background-color: #2e1f4f; border: 1px solid var(--highlight-color); color: var(--highlight-color);
+            margin-top: 14px;
+        }
+        .btn-secondary:hover { background-color: #3f2a6b; }
+
+        .result-box {
+            margin-top: 20px; padding: 18px; background-color: var(--primary-light);
+            border-left: 4px solid var(--highlight-color); border-radius: 8px; display: none;
+            white-space: pre-wrap; font-size: 0.95rem; color: var(--text-color); line-height: 1.7;
+        }
+
+        .next-btn {
+            width: 100%; background-color: var(--accent-color); color: white; border: none; padding: 14px;
+            font-size: 1rem; font-weight: bold; border-radius: 10px; cursor: pointer; margin-top: 16px; display: none;
+            transition: background-color 0.2s; box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+        }
+        .next-btn:hover { background-color: #7b1fa2; }
+
+        .loading {
+            text-align: center; color: var(--highlight-color); font-weight: bold; display: none; margin-top: 16px; font-size: 0.9rem;
+        }
+
+        .final-box, .detailed-box {
+            margin-top: 24px; padding: 22px; background-color: var(--primary-light);
+            border: 2px solid var(--highlight-color); border-radius: 12px; display: none; white-space: pre-wrap; line-height: 1.8;
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.15);
+        }
+
+        /* 6特性値指標のグラフエリア（上下余白および行間を詰める調整） */
+        .metrics-card {
+            background-color: #171326; border: 1px solid var(--border-color); border-radius: 10px;
+            padding: 12px 16px; margin-top: 10px; margin-bottom: 10px;
+        }
+        .metrics-title { color: var(--highlight-color); font-size: 0.95rem; font-weight: bold; margin-bottom: 10px; text-align: center; }
+        .metric-row { margin-bottom: 8px; }
+        .metric-row:last-child { margin-bottom: 0; }
+        .metric-label { font-size: 0.8rem; color: var(--text-sub); display: flex; justify-content: space-between; margin-bottom: 3px; }
+        .metric-bar-bg { background-color: #090a16; height: 8px; border-radius: 4px; position: relative; overflow: hidden; border: 1px solid var(--border-color); }
+        .metric-bar-fill { height: 100%; background: linear-gradient(90deg, #9c27b0, #ffd700); border-radius: 4px; width: 50%; transition: width 0.5s ease; }
+
+        .deco-icon { color: var(--highlight-color); font-size: 0.9em; margin: 0 4px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="corner-decor-bottom">
+        <span>✦</span>
+        <span>✦</span>
+    </div>
+
+    <!-- 1. パスワード画面 -->
+    <div class="auth-screen" id="authScreen">
+        <h1><span class="deco-icon">🌙</span> 《心の鏡》セラピーの部屋 <span class="deco-icon">✨</span></h1>
+        <p>アクセスするにはパスワードを入力してください</p>
+        <input type="password" id="passwordInput" class="auth-input" placeholder="Password">
+        <button class="btn" onclick="checkPassword()">ログイン 🗝️</button>
+
+        <div class="disclaimer-box">
+            <div class="disclaimer-title"><span>🛡️</span> ご利用上の注意・免責事項</div>
+            <ul class="disclaimer-list">
+                <li>本アプリは心理的投影を利用した自己内省の補助ツールであり、医療行為や専門的な心理カウンセリングに代わるものではありません。</li>
+                <li>入力された内容はAIによる応答生成のみに使用され、サーバー上に個人情報として恒久保存されることはありません。</li>
+                <li>強い精神的苦痛や危機を感じている場合は無理に利用を継続せず、専門の医療機関や相談窓口にご相談ください。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 2. インストラクション画面 -->
+    <div class="intro-screen" id="introScreen">
+        <h1><span class="deco-icon">🌙</span> 《心の鏡》セラピーの部屋 <span class="deco-icon">✨</span></h1>
+
+        <div class="intro-card">
+            <div class="intro-step">
+                <div class="step-text">
+                     <span>ようこそいらっしゃいました。ここは、心の《鏡》の部屋。タロットカードを使いますが、スピリチュアリティは無く、純粋な臨床心理学に基づいた、セラピー・アプリケーションです。完全ランダムに引いたカードを眺めると、あなたの心がそこに「投影」されてきます。その「投影」の様子をGeminiが読み取ってフィードバックしてくれます。 そんな、とても単純な心の《鏡》なのです。</span>
+                </div>
+            </div>
+            <div class="intro-step">
+                <div class="step-badge">1</div>
+                <div class="step-text">
+                    カードを引いて感想を書く <span class="deco-icon">🃏</span>
+                    <span>ランダムで引いたカードとその説明を見て、心の中との一致度を%で表し、感じたことを自由に書いてみてください。ここではタロットさんが軽く受け止めます。 一致度が0%だとしても、それは十分な材料になります。ただ、引いたカードが今の心模様とずれている（＝一致度が表せない）なと思ったら、引き直してもOKです。</span>
+                </div>
+            </div>
+            <div class="intro-step">
+                <div class="step-badge">2</div>
+                <div class="step-text">
+                    この操作を 3回 繰り返す <span class="deco-icon">🌙</span>
+                    <span>すべてランダムに選ばれる3枚のカードで、視点を変えながらそれぞれの気持ちを感じてみましょう。心の声が、少しずつ見えてくるかも知れません。</span>
+                </div>
+            </div>
+            <div class="intro-step">
+                <div class="step-badge">3</div>
+                <div class="step-text">
+                    タロットさんの総合アドバイス <span class="deco-icon">✨</span>
+                    <span>3回のリーディングを終えたら《総合分析》ボタンを押してください。タロットさんがあなたの「意識・無意識」を読み解き、深層心理へのメッセージを届けてくれます。何かちょっとだけ、「あ、そっか」と、気づきがあればいいですね。</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn" onclick="startWork()">始めてみましょう <span class="deco-icon">✨</span></button>
+    </div>
+
+    <!-- 3. メインワーク画面 -->
+    <div class="main-screen" id="mainScreen">
+        <div class="indicator-wrapper">
+            <div class="step-indicator" id="stepIndicator">✨ STEP 1 / 3 ✨</div>
+        </div>
+
+        <div id="interactiveArea">
+            <div class="card-box">
+                <div class="card-title" id="cardName">🔮 カードを選んでいます...</div>
+                
+                <div class="card-image-wrapper">
+                    <img id="cardImage" class="card-image" src="" alt="タロットカード" style="display: none;">
+                </div>
+
+                <div class="card-meaning" id="cardMeaning"></div>
+            </div>
+
+            <div style="text-align: center;">
+                <button class="redraw-btn" id="redrawBtn" onclick="drawCard()">🌙 別のカードを引く</button>
+            </div>
+
+            <div class="form-group">
+                <label for="matchRate">
+                    この解説は、今のあなたの気持ちとどれくらい一致していますか？
+                    <span id="rateValue" style="color: var(--highlight-color); font-size: 1.1rem; margin-left: 6px;">50%</span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" id="matchRate" min="0" max="100" value="50" step="5" oninput="document.getElementById('rateValue').innerText = this.value + '%'">
+                </div>
+                <div class="slider-labels">
+                    <span>全く一致しない (0%)</span>
+                    <span>半分くらい (50%)</span>
+                    <span>完全に一致 (100%)</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="userReflection">
+                    この解説やカードを見て、今どのようなものを感じていますか？
+                </label>
+                <textarea id="userReflection" placeholder="例：自由と言われても、今は現実的な責任が多すぎて身動きが取れないなあ、、、"></textarea>
+            </div>
+
+            <button class="btn" id="submitBtn" onclick="sendStepReflection()">タロットさんに気持ちを送る ✨</button>
+        </div>
+
+        <div class="loading" id="loading">🔮 タロットさんがあなたの言葉を受け止めています...</div>
+
+        <div class="result-box" id="resultBox"></div>
+
+        <button class="next-btn" id="nextBtn" onclick="nextStep()">次のカードへ進む ✨</button>
+
+        <!-- 最終結果表示エリア -->
+        <div class="final-box" id="finalBox"></div>
+
+        <!-- 詳しい分析結果の表示ボタン（総合分析完了後に表示） -->
+        <button class="btn btn-secondary" id="detailedBtn" onclick="runDetailedAnalysis()" style="display: none;">
+            📊 6つの心理特性と葛藤の詳細分析を見る
+        </button>
+
+        <!-- 詳しい分析結果エリア -->
+        <div class="detailed-box" id="detailedBox">
+            <div class="metrics-card" id="metricsCard">
+                <div class="metrics-title">📊 6つの心理特性統合スコア</div>
+                <div id="metricsBars"></div>
+
+                <!-- レーダーチャート表示エリア -->
+                <div style="max-width: 320px; margin: 15px auto;">
+                    <canvas id="radarChart"></canvas>
+                </div>
+
+                <!-- 困り度ランク表示エリア -->
+                <div id="troubleRankBox" style="text-align: center; margin: 12px 0 5px 0; padding: 10px; background-color: #1a162b; border-radius: 8px; border: 1px solid var(--highlight-color);">
+                    <div style="font-size: 0.85rem; color: var(--text-sub);">総合心理診断（困り度ランク）</div>
+                    <div id="troubleRank" style="font-size: 1.15rem; font-weight: bold; color: var(--highlight-color); margin-top: 4px;"></div>
+                </div>
+            </div>
+            <div id="detailedText"></div>
+        </div>
+
+        <button class="btn" id="resetBtn" onclick="resetAll()" style="display: none; margin-top: 20px;">もう一度診断する ✨</button>
+    </div>
+
+</div>
+
+<script>
+    let currentStep = 1;
+    let historyData = [];
+    let radarChartInstance = null;
+
+    // 「0」の基準線（正六角形）を黄色で強調描画するカスタムプラグイン
+    const zeroLinePlugin = {
+        id: 'zeroLineHighlight',
+        afterDraw(chart) {
+            const scale = chart.scales.r;
+            if (!scale) return;
+
+            // 0 の位置の半径を取得
+            const radius = scale.getDistanceFromCenterForValue(0);
+            const xCenter = scale.xCenter;
+            const yCenter = scale.yCenter;
+            const angleCount = scale._pointLabelPositioners ? scale._pointLabelPositioners.length : 6;
+
+            const ctx = chart.ctx;
+            ctx.save();
+            ctx.beginPath();
+
+            for (let i = 0; i < angleCount; i++) {
+                const angle = scale.getIndexAngle(i) - Math.PI / 2;
+                const x = xCenter + radius * Math.cos(angle);
+                const y = yCenter + radius * Math.sin(angle);
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.closePath();
+            ctx.strokeStyle = '#ffd700'; // 黄色（ゴールド）
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+        }
+    };
+
+    async function checkPassword() {
+        const pwd = document.getElementById('passwordInput').value;
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pwd })
+            });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('introScreen').style.display = 'block';
+            } else {
+                alert('パスワードが正しくありません。');
+            }
+        } catch (err) {
+            alert('通信エラーが発生しました。');
+        }
+    }
+
+    function startWork() {
+        document.getElementById('introScreen').style.display = 'none';
+        document.getElementById('mainScreen').style.display = 'block';
+        drawCard();
+    }
+
+    async function drawCard() {
+        document.getElementById('cardName').innerText = '🔮 カードを選んでいます...';
+        document.getElementById('cardMeaning').innerText = '';
+        const imgElem = document.getElementById('cardImage');
+        imgElem.style.display = 'none';
+        imgElem.classList.remove('reversed');
+
+        try {
+            const res = await fetch('/api/draw');
+            const card = await res.json();
+            document.getElementById('cardName').innerText = card.name;
+            document.getElementById('cardMeaning').innerText = card.meaning;
+            
+            if (card.image_url) {
+                imgElem.src = card.image_url;
+                if (card.is_reversed) {
+                    imgElem.classList.add('reversed');
+                }
+                imgElem.style.display = 'inline-block';
+            }
+        } catch (err) {
+            document.getElementById('cardName').innerText = 'カードの取得に失敗しました';
+        }
+    }
+
+    async function sendStepReflection() {
+        const cardName = document.getElementById('cardName').innerText;
+        const cardMeaning = document.getElementById('cardMeaning').innerText;
+        const matchRate = document.getElementById('matchRate').value;
+        const userReflection = document.getElementById('userReflection').value;
+
+        if (!userReflection.trim()) {
+            alert('感想を入力してください。');
+            return;
+        }
+
+        const currentData = {
+            card_name: cardName,
+            card_meaning: cardMeaning,
+            match_rate: matchRate,
+            user_reflection: userReflection
+        };
+
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const resultBox = document.getElementById('resultBox');
+        const redrawBtn = document.getElementById('redrawBtn');
+
+        submitBtn.disabled = true;
+        redrawBtn.disabled = true;
+        loading.style.display = 'block';
+        resultBox.style.display = 'none';
+
+        try {
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    mode: 'step',
+                    ...currentData
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                alert('エラー: ' + data.error);
+                submitBtn.disabled = false;
+                redrawBtn.disabled = false;
+            } else {
+                historyData.push(currentData);
+
+                resultBox.innerText = data.result;
+                resultBox.style.display = 'block';
+                submitBtn.style.display = 'none';
+
+                const nextBtn = document.getElementById('nextBtn');
+                if (currentStep < 3) {
+                    nextBtn.innerText = `次のカードへ進む (${currentStep + 1} / 3) ✨`;
+                } else {
+                    nextBtn.innerText = '3回の対話からタロットさんの総合分析を受ける 🔮';
+                }
+                nextBtn.style.display = 'block';
+            }
+        } catch (err) {
+            alert('通信エラーが発生しました。');
+            submitBtn.disabled = false;
+            redrawBtn.disabled = false;
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+
+    function nextStep() {
+        if (currentStep < 3) {
+            currentStep++;
+            document.getElementById('stepIndicator').innerText = `✨ STEP ${currentStep} / 3 ✨`;
+
+            document.getElementById('userReflection').value = '';
+            document.getElementById('matchRate').value = 50;
+            document.getElementById('rateValue').innerText = '50%';
+            document.getElementById('resultBox').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.style.display = 'block';
+            submitBtn.disabled = false;
+            document.getElementById('redrawBtn').disabled = false;
+
+            drawCard();
+        } else {
+            runFinalAnalysis();
+        }
+    }
+
+    async function runFinalAnalysis() {
+        document.getElementById('interactiveArea').style.display = 'none';
+        document.getElementById('resultBox').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+        document.getElementById('stepIndicator').innerText = '✨ COMPLETE ✨';
+
+        const loading = document.getElementById('loading');
+        loading.innerText = '🔮 3つの心の対話を重ね合わせ、タロットさんが深層心理を読み解いています...';
+        loading.style.display = 'block';
+
+        try {
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    mode: 'final',
+                    history: historyData
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                alert('エラー: ' + data.error);
+            } else {
+                const finalBox = document.getElementById('finalBox');
+                finalBox.innerText = data.result;
+                finalBox.style.display = 'block';
+
+                document.getElementById('detailedBtn').style.display = 'block';
+                document.getElementById('resetBtn').style.display = 'block';
+            }
+        } catch (err) {
+            alert('通信エラーが発生しました。');
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+
+    async function runDetailedAnalysis() {
+        const loading = document.getElementById('loading');
+        loading.innerText = '📊 6つの心理特性パラメータと葛藤状態を多面的に解析しています...';
+        loading.style.display = 'block';
+        document.getElementById('detailedBtn').disabled = true;
+
+        try {
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    mode: 'detailed',
+                    history: historyData
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                alert('エラー: ' + data.error);
+            } else {
+                renderMetrics(data.metrics);
+                document.getElementById('detailedText').innerText = data.result;
+                document.getElementById('detailedBox').style.display = 'block';
+                document.getElementById('detailedBtn').style.display = 'none';
+            }
+        } catch (err) {
+            alert('通信エラーが発生しました。');
+        } finally {
+            loading.style.display = 'none';
+            document.getElementById('detailedBtn').disabled = false;
+        }
+    }
+
+    function renderMetrics(metrics) {
+        if (!metrics || !metrics.weighted_scores) return;
+
+        const labels = {
+            "function": { name: "機能 (感情 ↔ 思考)", min: "感情(-2)", max: "思考(+2)", short: "機能" },
+            "direction": { name: "方向 (受動 ↔ 能動)", min: "受動(-2)", max: "能動(+2)", short: "方向" },
+            "depth": { name: "深度 (無意識 ↔ 意識)", min: "無意識(-2)", max: "意識(+2)", short: "深度" },
+            "evaluation": { name: "評価 (歪み ↔ 適応)", min: "歪み(-2)", max: "適応(+2)", short: "評価" },
+            "interpersonal": { name: "対人 (自己 ↔ 他者)", min: "自己(-2)", max: "他者(+2)", short: "対人" },
+            "time": { name: "時間 (停滞 ↔ 変容)", min: "停滞(-2)", max: "変容(+2)", short: "時間" }
+        };
+
+        const container = document.getElementById('metricsBars');
+        container.innerHTML = '';
+
+        const keys = Object.keys(labels);
+        const rawScores = keys.map(k => metrics.weighted_scores[k] || 0);
+
+        // 1. バーグラフの描画
+        for (const [key, meta] of Object.entries(labels)) {
+            const val = metrics.weighted_scores[key] || 0; // -2 ~ +2
+            // -2 ~ +2 を 0% ~ 100% に変換
+            const percent = Math.min(100, Math.max(0, ((val + 2) / 4) * 100));
+            const isConflict = metrics.conflict_axes && metrics.conflict_axes.includes(key);
+
+            const row = document.createElement('div');
+            row.className = 'metric-row';
+            row.innerHTML = `
+                <div class="metric-label">
+                    <span>${meta.name} ${isConflict ? '<strong style="color:#ff5252;">[葛藤検出]</strong>' : ''}</span>
+                    <span>${val > 0 ? '+' + val : val}</span>
+                </div>
+                <div class="metric-bar-bg">
+                    <div class="metric-bar-fill" style="width: ${percent}%;"></div>
+                </div>
+            `;
+            container.appendChild(row);
+        }
+
+        // 2. 困り度計算（絶対値の総和：最大 12.0）
+        const totalTroubleScore = rawScores.reduce((acc, val) => acc + Math.abs(val), 0);
+
+        let rank = "";
+        let rankColor = "";
+        if (totalTroubleScore >= 9.0) {
+            rank = "ランク S (非常に強い葛藤・困り感)";
+            rankColor = "#ff5252";
+        } else if (totalTroubleScore >= 6.0) {
+            rank = "ランク A (大きめの課題や迷い)";
+            rankColor = "#ff9800";
+        } else if (totalTroubleScore >= 3.0) {
+            rank = "ランク B (穏やかなモヤモヤ・変化の兆し)";
+            rankColor = "#ffd700";
+        } else {
+            rank = "ランク C (安定した状態・低い葛藤)";
+            rankColor = "#4caf50";
+        }
+
+        const rankElem = document.getElementById('troubleRank');
+        rankElem.innerText = `${rank} (スコア: ${totalTroubleScore.toFixed(2)} / 12.0)`;
+        rankElem.style.color = rankColor;
+
+        // 3. レーダーチャート描画（中心: -2, 最大: +2, 0ライン強調）
+        const chartData = rawScores; // 生の値 (-2 〜 +2)
+        const chartLabels = keys.map(k => labels[k].short);
+        const ctx = document.getElementById('radarChart').getContext('2d');
+
+        if (radarChartInstance) {
+            radarChartInstance.destroy();
+        }
+
+        radarChartInstance = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: '特性値',
+                    data: chartData,
+                    backgroundColor: 'rgba(156, 39, 176, 0.3)',
+                    borderColor: '#ffd700',
+                    pointBackgroundColor: '#ffd700',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        min: -2,
+                        max: 2,
+                        ticks: { display: true, stepSize: 1, color: '#b0bec5', backdropColor: 'transparent' },
+                        grid: { color: 'rgba(255, 255, 255, 0.15)' },
+                        angleLines: { color: 'rgba(255, 255, 255, 0.25)' },
+                        pointLabels: { color: '#e0e0e0', font: { size: 12, weight: 'bold' } }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            },
+            plugins: [zeroLinePlugin]
+        });
+    }
+
+    function resetAll() {
+        currentStep = 1;
+        historyData = [];
+
+        document.getElementById('finalBox').style.display = 'none';
+        document.getElementById('finalBox').innerText = '';
+        document.getElementById('detailedBox').style.display = 'none';
+        document.getElementById('detailedText').innerText = '';
+        document.getElementById('detailedBtn').style.display = 'none';
+        document.getElementById('resetBtn').style.display = 'none';
+
+        document.getElementById('stepIndicator').innerText = '✨ STEP 1 / 3 ✨';
+        document.getElementById('userReflection').value = '';
+        document.getElementById('matchRate').value = 50;
+        document.getElementById('rateValue').innerText = '50%';
+
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.style.display = 'block';
+        submitBtn.disabled = false;
+        document.getElementById('redrawBtn').disabled = false;
+
+        document.getElementById('interactiveArea').style.display = 'block';
+        drawCard();
+    }
+</script>
+
+</body>
+</html>
