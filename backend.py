@@ -6,11 +6,13 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 from google import genai
 
 app = Flask(__name__, template_folder=".")
-app.secret_key = os.environ.get("SECRET_KEY", "mint_tarot_secret_key_12345")
 
-# --- パスワード設定 ---
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin_tarot")
-USER_PASSWORD = os.environ.get("USER_PASSWORD", "tarrot")
+# --- セキュリティ設定（環境変数からの取得およびデフォルト値の安全化） ---
+app.secret_key = os.environ.get("SECRET_KEY", "change_this_secret_in_production")
+
+# パスワード設定（デフォルト値を持たせず環境変数から取得）
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+USER_PASSWORD = os.environ.get("USER_PASSWORD")
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
@@ -340,11 +342,12 @@ def login():
     data = request.json or {}
     pwd = data.get("password", "")
     
-    if pwd == ADMIN_PASSWORD:
+    # 環境変数が未設定の場合は認証失敗（Noneとの一致を防ぐ）
+    if ADMIN_PASSWORD and pwd == ADMIN_PASSWORD:
         session["authenticated"] = True
         session["role"] = "admin"
         return jsonify({"success": True, "role": "admin", "limit_reached": False})
-    elif pwd == USER_PASSWORD:
+    elif USER_PASSWORD and pwd == USER_PASSWORD:
         session["authenticated"] = True
         session["role"] = "user"
         
