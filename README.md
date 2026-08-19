@@ -67,24 +67,29 @@ ProTaro は、大規模言語モデル（LLM）とタロットカードの象徴
 ## 💻 Getting Started（開発環境での実行方法）
 
 1. Repository Clone
-Bash
-git clone [https://github.com/](https://github.com/)[YOUR_GITHUB_USERNAME]/[YOUR_REPOSITORY_NAME].git
-cd [YOUR_REPOSITORY_NAME]
+```bash
+git clone https://github.com/Project-Tarot/projectarot.git
+cd projectarot
+```
 
 2. Dependencies Installation
-Bash
+```bash
 pip install -r requirements.txt
+```
 
 3. Environment Variables Setting
 動作に必要な以下の環境変数を設定してください（.env またはホスティング環境）。
+```bash
     GEMINI_API_KEY: Google Gemini API Key
     SECRET_KEY: Flask Session Signature Key
     ADMIN_PASSWORD: Administrator Password
     USER_PASSWORD: General User Password
+```
 
-4. Local Run
-Bash
+5. Local Run
+```bash
 python app.py
+```
 ブラウザで http://localhost:5000 にアクセスします。
 
 ## 🔬 Research & Ethics（研究と倫理）
