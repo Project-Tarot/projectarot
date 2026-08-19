@@ -1,7 +1,8 @@
 # ProTaro Project (ProTaro-Core)
 
-> **A Dual-Black-Box Control Framework for Safe AI Self-Counseling via Symbolic Projection (Tarot) and Generative LLM**  
-> **タロットの象徴的投影とLLM受容対話による「二重のブラックボックス」制御型AIセルフカウンセリング・フレームワーク**
+[![DOI](https://zenodo.org/badge/1335480489.svg)](https://doi.org/10.5281/zenodo.22005942)
+
+> **A Dual-Black-Box Control Framework for Safe AI Self-Counseling via Symbolic Projection (Tarot) and Generative LLM**
 
 ---
 
