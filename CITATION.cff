@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Izumi"
+    given-names: "Mitsunori"
+title: "ProTaro: A Dual-Black-Box Control Framework for Safe AI Self-Counseling via Symbolic Projection"
+version: 1.0.0
+date-released: 2026-08-19
+url: "https://github.com/Project-Tarot/projectarot"
