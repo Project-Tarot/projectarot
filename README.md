@@ -32,7 +32,7 @@ ProTaro は、大規模言語モデル（LLM）とタロットカードの象徴
 * **3回反復による交点抽出:** 対話を3回（3ステップ）のシークエンスに限定し、対話の無限ループ（依存）を防ぎつつ、思考の「交点（核心的な気づき）」を抽出。
 
 ### 2. インフラ・API経費抑制と安全性の両立
-* **Rate-Limiting Logic（過剰利用防止）:** ブラウザストレージおよびアクセス制御により、同一ユーザーによる無制限な連打（ループ利用）を抑制。依存防止という臨床的意義と、API運用コストの最小化を同時に達成。
+* **Rate-Limiting Logic（過剰利用防止）:** IP単位および全体アクセス制御により、同一ユーザーによる無制限な連打（ループ利用）を抑制。依存防止という臨床的意義と、API運用コストの最小化を同時に達成。
 
 ---
 
@@ -48,10 +48,66 @@ ProTaro は、大規模言語モデル（LLM）とタロットカードの象徴
  [ 2. Clinical Guardrail Engine ]
    ├── Prompt Constraints (Non-judgmental / Mirroring)
    ├── Gemini API (LLM Session)
-   └── Rate-Limiting Controller (1-Session Rule)
+   └── Rate-Limiting Controller (Daily Limits & Circuit Breaker)
          │
          ▼
  [ 3. Iterative Dialogue (Max 3 Loops) ]
          │
          ▼
  [ 4. Intersection Extraction & Self-Insight ] ─── [ Anonymous Evaluation ]
+```
+
+## 🛠️ Tech Stack（使用技術）
+
+    Backend Framework: Python 3.10+ / Flask
+    AI Engine: Google Gemini API (gemini-2.5-flash)
+    Infrastructure / Hosting: Render
+    Security & Auth: Environment Variables Management (API Keys, Session Secret Key, Hash Passwords)
+
+## 💻 Getting Started（開発環境での実行方法）
+
+1. Repository Clone
+Bash
+git clone [https://github.com/](https://github.com/)[YOUR_GITHUB_USERNAME]/[YOUR_REPOSITORY_NAME].git
+cd [YOUR_REPOSITORY_NAME]
+
+2. Dependencies Installation
+Bash
+pip install -r requirements.txt
+
+3. Environment Variables Setting
+動作に必要な以下の環境変数を設定してください（.env またはホスティング環境）。
+    GEMINI_API_KEY: Google Gemini API Key
+    SECRET_KEY: Flask Session Signature Key
+    ADMIN_PASSWORD: Administrator Password
+    USER_PASSWORD: General User Password
+
+4. Local Run
+Bash
+python app.py
+ブラウザで http://localhost:5000 にアクセスします。
+
+## 🔬 Research & Ethics（研究と倫理）
+
+本プロジェクトは、高等教育機関や一般ユーザーを対象とした学術実証研究として展開されています。
+    インフォームド・コンセントの組み込み: アプリケーション初期起動時に、研究目的およびデータ提供の任意性についての説明・同意UIを完備。
+    プライバシーと匿名性: 対話ログおよび評価アンケートデータは完全に匿名化（Anonymized）処理され、個人のプライバシーを厳重に保護します。
+
+## ✒️ Citation / How to Cite（引用表記）
+
+本リポジトリのコードやアルゴリズムの概念を論文・学会等で引用される場合は、以下の表記をご使用ください。
+
+```text
+@misc{Izumi2026ProTaro,
+  author       = {Mitsunori Izumi},
+  title        = {ProTaro: A Dual-Black-Box Control Framework for Safe AI Self-Counseling via Symbolic Projection},
+  year         = {2026},
+  publisher    = {GitHub},
+  journal      = {GitHub repository},
+  howpublished = {\url{[https://github.com/](https://github.com/)[YOUR_GITHUB_USERNAME]/[YOUR_REPOSITORY_NAME]}}
+}
+```
+
+## 📜 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
